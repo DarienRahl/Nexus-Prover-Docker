@@ -1,15 +1,19 @@
 
 # Nexus-Prover Docker Installation Guide
 
-This repository provides a Docker setup for installing and running the Nexus-Prover. Follow these steps to build and run the Docker container for Nexus-Prover on your system.
+This guide will walk you through installing and running Nexus-Prover using Docker. It’s divided into two main sections:
+1. **Setting up Docker and building the Nexus-Prover Docker image**
+2. **Running, monitoring, and managing the Docker container**
+
+---
 
 ## Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) installed on your system. You can follow the instructions for your platform on Docker's official website.
+Before you begin, make sure you have **Docker** installed on your machine. If not, follow the instructions below.
 
-### Docker Installation (Optional)
+### Step 1: Docker Installation (Optional)
 
-If you don’t have Docker installed yet, you can install it by running the following commands for Ubuntu:
+If Docker is not installed, use the following commands to install Docker on Ubuntu:
 
 ```bash
 sudo apt-get update
@@ -18,84 +22,129 @@ sudo systemctl start docker
 sudo systemctl enable docker
 ```
 
-For other platforms, please refer to the official Docker [installation guide](https://docs.docker.com/get-docker/).
+For other platforms, refer to the official [Docker installation guide](https://docs.docker.com/get-docker/).
 
-## Cloning the Repository
+---
 
-Clone this repository to your local machine:
+## Step 2: Cloning the Repository
+
+Next, clone this repository to your local machine:
 
 ```bash
-git clone https://github.com/yourusername/nexus-prover-docker.git
+git clone https://github.com/darienrahl/nexus-prover-docker.git
 cd nexus-prover-docker
 ```
 
-## Building the Docker Image
+---
 
-To build the Docker image, navigate to the folder containing the `Dockerfile` and run the following command:
+## Step 3: Building the Docker Image
+
+Navigate to the folder where the `Dockerfile` is located and build the Docker image using the following command:
 
 ```bash
 docker build -t nexus-prover .
 ```
 
-This will create a Docker image with the necessary dependencies and configuration to run Nexus-Prover.
+This command will create a Docker image with all the necessary dependencies for running Nexus-Prover.
 
-## Running the Nexus-Prover Container
+---
 
-Once the image has been built, you can run the container in the background (detached mode) with:
+# Running and Managing Nexus-Prover Docker Container
+
+---
+
+## Step 4: Running the Nexus-Prover Container in Detached Mode
+
+To run the Docker container in the background (detached mode), execute:
 
 ```bash
 docker run -d nexus-prover
 ```
 
-The container will now run Nexus-Prover in the background. You can check if it's running using:
+The container will now be running in the background.
+
+---
+
+## Step 5: Monitoring the Nexus-Prover Docker Container
+
+Once the container is running, you may want to monitor its logs and check the status of the container.
+
+### Viewing Container Logs
+
+To view logs, use the following command:
+
+```bash
+docker logs <CONTAINER ID or NAME>
+```
+
+To follow the logs in real-time, use:
+
+```bash
+docker logs -f <CONTAINER ID or NAME>
+```
+
+### Attaching to a Running Container
+
+If you need to interact with the running container, you can attach to it using:
+
+```bash
+docker exec -it <CONTAINER ID or NAME> /bin/bash
+```
+
+### Checking Container Status
+
+To check the status of the container, run:
 
 ```bash
 docker ps
 ```
 
-## Stopping the Container
-
-To stop the container, first list the running containers to get the `CONTAINER ID`:
+This will list all running containers. If the container is stopped, use:
 
 ```bash
-docker ps
+docker ps -a
 ```
 
-Then, use the `docker stop` command followed by the `CONTAINER ID`:
+---
+
+## Step 6: Stopping the Docker Container
+
+To stop the Nexus-Prover container, use:
 
 ```bash
 docker stop <CONTAINER ID>
 ```
 
-## Updating the Nexus-Prover Code
+---
 
-If you need to update the Nexus-Prover repository inside the container, follow these steps:
+# Updating the Nexus-Prover Code
 
-1. Enter the running container by executing:
+If you need to update the Nexus-Prover code within the container, follow these steps:
 
-```bash
-docker exec -it <CONTAINER ID> /bin/bash
-```
+1. Enter the running container:
+   ```bash
+   docker exec -it <CONTAINER ID> /bin/bash
+   ```
 
 2. Navigate to the `network-api` directory and pull the latest changes:
+   ```bash
+   cd ~/.nexus/network-api
+   git pull
+   ```
 
-```bash
-cd ~/.nexus/network-api
-git pull
-```
+3. Restart the `prover` by running:
+   ```bash
+   cd clients/cli
+   cargo run --release --bin prover -- beta.orchestrator.nexus.xyz
+   ```
 
-3. Restart the `prover` by navigating to the CLI client directory and running the prover:
+---
 
-```bash
-cd clients/cli
-cargo run --release --bin prover -- beta.orchestrator.nexus.xyz
-```
+## Step 7: Customizing the Dockerfile
 
-## Customizing the Dockerfile
+The `Dockerfile` installs all the required dependencies for Nexus-Prover and runs the prover script. You can modify the `Dockerfile` to add any additional dependencies you may need.
 
-The `Dockerfile` included in this repository installs all the required dependencies for Nexus-Prover, sets up Rust, and runs the prover script. If you need to make modifications (e.g., adding more dependencies), feel free to edit the `Dockerfile` accordingly.
-
-## Full Dockerfile Overview
+Here's the Dockerfile included in this repository:
 
 ```Dockerfile
 # Use the base image from Ubuntu
@@ -153,6 +202,10 @@ RUN chmod +x /root/run_nexus_prover.sh
 CMD ["/root/run_nexus_prover.sh"]
 ```
 
+---
+
 ## Issues and Support
 
-If you encounter any issues or need help, feel free to open an issue on this repository, and I will assist you as soon as possible.
+If you encounter any issues or need assistance, feel free to open an issue on this repository.
+
+---
